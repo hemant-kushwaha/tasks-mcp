@@ -1,5 +1,7 @@
 import { McpServer, createMcpHandler } from "@modelcontextprotocol/server";
 import { registerTaskTools } from "./tools.js";
+import { registerTaskResources } from "./resources.js";
+import { registerTaskPrompts } from "./prompts.js";
 
 const handler = createMcpHandler(() => {
   const server = new McpServer({
@@ -8,6 +10,8 @@ const handler = createMcpHandler(() => {
   });
 
   registerTaskTools(server);
+  registerTaskResources(server);
+  registerTaskPrompts(server);
 
   return server;
 });
