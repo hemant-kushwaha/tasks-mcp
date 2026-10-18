@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 
 import { connectMcp } from "./mcp-client.js";
-import { askGemini } from "./agent.js";
+import { chat, planDay } from "./agent.js";
 
 // Connect before accepting user requests
 await connectMcp();
@@ -10,15 +10,35 @@ await connectMcp();
 const app = express();
 app.use(express.json());
 
-app.get("/ask", async (request, response) => {
-  const { message } = request.body;
+app.get("/ask", async (req, res) => {
+  const { message } = req.query;
+
+  if (typeof message !== "string" || !message.trim()) {
+    return res.status(400).send("Query parameter 'message' is required.");
+  }
+
   try {
-    const answer = await askGemini(message);
-    return response.send(answer);
+    const answer = await chat(message);
+    return res.send(answer);
   } catch (error) {
     console.error(error);
+    return res.status(500).send("Unable to process the request.");
+  }
+});
 
-    return response.status(500).send("Unable to process the request");
+app.get("/plan", async (req, res) => {
+  const { hours } = req.query;
+
+  if (typeof hours !== "string" || !hours.trim()) {
+    return res.status(400).send("Query parameter 'hours' is required.");
+  }
+
+  try {
+    const answer = await planDay(hours);
+    return res.send(answer);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Unable to plan your day.");
   }
 });
 

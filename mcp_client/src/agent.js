@@ -1,5 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
-import { getGeminiTools, callMcpTool } from "./mcp-client.js";
+import {
+  getGeminiTools,
+  callMcpTool,
+  readTaskGuidelines,
+  getPlanDayPrompt,
+} from "./mcp-client.js";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
@@ -62,4 +67,23 @@ export async function askGemini(message) {
     // 5. Continue the interaction with tool results
     input = functionResults;
   }
+}
+
+export async function chat(message) {
+  const guidelines = await readTaskGuidelines();
+
+  return askGemini(`
+    You are a task management assistant.
+
+    Guidelines:
+    ${guidelines}
+
+    User request:
+    ${message}
+  `);
+}
+
+export async function planDay(hours) {
+  const prompt = await getPlanDayPrompt(hours);
+  return askGemini(prompt);
 }

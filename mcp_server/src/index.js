@@ -2,8 +2,8 @@
 import { createServer } from "node:http";
 import {
   toNodeHandler,
-  validateHost,
-  validateOrigin,
+  localhostHostValidation,
+  localhostOriginValidation,
 } from "@modelcontextprotocol/node";
 import handler from "./mcp.js";
 

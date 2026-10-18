@@ -35,3 +35,26 @@ export async function callMcpTool(name, args) {
     arguments: args,
   });
 }
+
+export async function readTaskGuidelines() {
+  const result = await mcpClient.readResource({
+    uri: "task://guidelines",
+  });
+
+  return result.contents.map((content) => content.text ?? "").join("\n");
+}
+export async function getPlanDayPrompt(hours) {
+  const result = await mcpClient.getPrompt({
+    name: "plan_day",
+    arguments: {
+      availableHours: String(hours),
+    },
+  });
+
+  return result.messages
+    .map((message) => {
+      const content = message.content;
+      return content.type === "text" ? content.text : "";
+    })
+    .join("\n");
+}
